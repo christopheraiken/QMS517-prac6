@@ -1,5 +1,8 @@
 #...QMS517 prac 6 - geospatial analysis
 #
+#...some analysis with the terra package
+#
+#   check here: https://cran.r-project.org/web/packages/terra/refman/terra.html
 #my.nasa.name = "christopher.aiken"
 #my.nasa.pwd = "9fgyRqBfzhX.sWM"
 
@@ -11,7 +14,8 @@ library(rnaturalearth)
 #   https://github.com/christopheraiken/QMS517-prac6/blob/main/AQUA_MODIS.20250101_20250131.L4m.MO.GSM.chl_gsm.9km.nc
 #   and/or read in your own from: 
 #   https://oceandata.sci.gsfc.nasa.gov/directdataaccess/
-chl_file = "AQUA_MODIS.20250101_20250131.L4m.MO.GSM.chl_gsm.9km.nc"
+#chl_file = "AQUA_MODIS.20250101_20250131.L4m.MO.GSM.chl_gsm.9km.nc"   #...monthly
+chl_file = "AQUA_MODIS.20250101_20250108.L4m.8D.GSM.chl_gsm.9km.nc"    #...eight daily
 chl = rast(chl_file)
 #   look at the file name.  what exactly does this file contain?
 #   check the metadata: eg what is the coordinate reference system?
@@ -37,23 +41,54 @@ bathy = rast(gebco_url,win=ext(eez.oz))
 countries = rnaturalearth::ne_countries(scale = "medium")
 #    are they all on the same coordinate reference system?
 
-#...quick and dirty plot
+#...quick and dirty plots
 plot(log(chl))
 plot(countries,lwd=0.1,add=T)
 plot(eez,lwd=2,add=T)
 
+plot(bathy)
+plot(eez,add=T)
+
 #...we can mask out everything outside the eez
-chl_new <- mask(chl, eez, touches = FALSE)
+chl_eez <- mask(chl, eez, touches = FALSE)
 #  didn't work?  why not??? how do we fix???
 
 #...to plot
-plot(log(chl_new))
+plot(log(chl_eez))
 
 #...to crop (what does the second argument mean?)
-chl_new = crop(chl_new,ext(eez))
+chl_eez = crop(chl_eez,ext(eez))
 
 #...plot again
-plot(log(chl_new))
+plot(log(chl_eez))
 
 #...write out a layer as a geotiff - can be imported to google earth/other GIS
-writeRaster(chl_new, "my_geotiff.tif", overwrite=TRUE)
+#   does it show up in the right place?
+writeRaster(chl_eez, "my_geotiff.tif", overwrite=TRUE)
+
+#...we can mask out all the deep water like this
+shelf = bathy>(-200)
+chl_shelf <- resample(chl,shelf,method="near")
+chl_shelf <- mask(chl_shelf,shelf,maskvalues=F)
+plot(log(chl_shelf))
+
+#...some basic stats
+summary(chl_eez)
+autocor(chl_eez)
+
+#...find contiguous regions
+chl_patches = patches(chl_eez>0.5,zeroAsNA=T)
+plot(chl_patches)
+
+#...or with clustering
+chl_clusters = k_means(chl_eez,centers=10)
+plot(chl_clusters)
+
+#...an example of interpolation to fill in gaps
+ii = which(!is.na(values(chl_eez)))
+good = extract(chl_eez,ii,xy=T)
+chl_filled = interpIDW(chl_eez, as.matrix(good),radius=1)
+plot(chl_filled)
+
+#...can you test whether there is more chlorophyll on the shelf or offshore
+#   around Tasmania??
