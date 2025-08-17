@@ -8,4 +8,5 @@ some data
 
 some R code
 
-[my_geotiff.tif](https://github.com/user-attachments/files/21821795/my_geotiff.tif)
+
+<img width="941" height="599" alt="my_geotiff" src="https://github.com/user-attachments/assets/cdba95de-76d7-456a-aa31-d95fda97d878" />
