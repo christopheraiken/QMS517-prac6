@@ -3,8 +3,15 @@
 #...some analysis with the terra package
 #
 #   check here: https://cran.r-project.org/web/packages/terra/refman/terra.html
-#my.nasa.name = "christopher.aiken"
-#my.nasa.pwd = "9fgyRqBfzhX.sWM"
+#
+#   to get your own earthdata account, go here:
+#
+#   https://urs.earthdata.nasa.gov/users/new
+#
+#   here's mine if you get stuck:
+#
+#   my.nasa.name = "christopher.aiken"
+#   my.nasa.pwd = "9fgyRqBfzhX.sWM"
 
 library(sf)
 library(terra)
