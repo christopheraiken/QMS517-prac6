@@ -2,8 +2,6 @@
 
 Here you can find:
 
-the ppt introducing the prac
-
 some data
 
 some R code
