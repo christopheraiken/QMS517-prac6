@@ -75,6 +75,10 @@ plot(log(chl_eez))
 #   does it show up in the right place?
 writeRaster(chl_eez, "my_geotiff.tif", overwrite=TRUE)
 
+#...the proper answer!!
+library(raster)
+KML(chl_eez, "my_layer.kmz", overwrite=TRUE)
+
 #...we can mask out all the deep water like this
 shelf = bathy>(-200)
 chl_shelf <- resample(chl,shelf,method="near")
